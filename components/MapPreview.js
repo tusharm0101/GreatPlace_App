@@ -1,5 +1,5 @@
 import React from "react";
-import { Image, TouchableOpacity, StyleSheet, Touchable } from "react-native";
+import { Image, TouchableOpacity, StyleSheet } from "react-native";
 
 import ENV from '../env';
 

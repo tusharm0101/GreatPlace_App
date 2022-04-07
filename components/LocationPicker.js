@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState, useEffect } from "react";
 import { 
     View,
     Button,
@@ -16,6 +16,17 @@ import MapPreview from "./MapPreview";
 const LocationPicker = props => {
     const [isFetching, setIsFetching] = useState(false);
     const [pickedLocation, setPickedlocation] = useState();
+
+    const mapPickedLocation = props.navigation.getParam('pickedLocation');
+
+    const {onLocationPicked} = props;
+
+    useEffect(() => {
+        if (mapPickedLocation) {
+            setPickedlocation(mapPickedLocation);
+            onLocationPicked(mapPickedLocation);
+        }
+    }, [mapPickedLocation, onLocationPicked]);
 
     const verifyPermissions = async () => {
         const result = await Permissions.askAsync(Permissions.LOCATION);
@@ -40,8 +51,11 @@ const LocationPicker = props => {
             const location = Location.getCurrentPositionAsync({
                 timeout: 5000
             });
-            console.log(location);
             setPickedlocation({
+                lat: location.coords.latitude,
+                lng: location.coords.longitude 
+            });
+            props.onLocationPicked({
                 lat: location.coords.latitude,
                 lng: location.coords.longitude 
             });
@@ -54,16 +68,23 @@ const LocationPicker = props => {
         setIsFetching(false);
     };
 
-    const pickOnMapHandler = () => {};
+    const pickOnMapHandler = () => {
+        props.navigation.navigate('Map');
+    };
 
     return (
-        <View style={styles.locationPicker}>
-            <MapPreview>
+        <View style={styles.locationPicker} onPress={pickOnMapHandler}>
+                     
+            <MapPreview 
+                style={styles.mapPreview} 
+                location={pickedLocation} 
+                onPress={pickOnMapHandler}
+            >
                 {isFetching ? (
                     <ActivityIndicator size='large' color={Colors.primary} />
                 ) : (
                     <Text>No location chosen yet!</Text>
-                )}
+                ) }
             </MapPreview>
             <View style={styles.actions}>
                 <Button 

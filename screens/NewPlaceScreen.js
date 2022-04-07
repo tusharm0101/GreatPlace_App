@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -17,6 +17,7 @@ import LocationPicker from '../components/LocationPicker';
 const NewPlaceScreen = props => {
   const [titleValue, setTitleValue] = useState('');
   const [selectedImage, setSelectedImage] = useState();
+  const [selectedLocation, setSelectedLocation] = useState();
 
   const dispatch = useDispatch();
 
@@ -29,8 +30,12 @@ const NewPlaceScreen = props => {
     setSelectedImage(imagePath);
   };
 
+  const locationPickerHandler = useCallback(location => {
+    setSelectedLocation(location);
+  }, []);
+
   const savePlaceHandler = () => {
-    dispatch(placesActions.addPlace(titleValue, selectedImage));
+    dispatch(placesActions.addPlace(titleValue, selectedImage, selectedLocation));
     props.navigation.goBack();
   };
 
@@ -44,7 +49,7 @@ const NewPlaceScreen = props => {
           value={titleValue}  
         />
         <ImagePicker onImageTaken={imageTakenHandler} />
-        <LocationPicker />
+        <LocationPicker navigation={props.navigation} onLocationPicked={locationPickerHandler}/>
         <Button 
           title='Save place'  
           color={Colors.primary} 
